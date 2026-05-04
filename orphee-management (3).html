@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orphee Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a10;--bg2:#111118;--bg3:#18181f;--bg4:#20202a;--bg5:#28283a;
+  --border:#252535;--border2:#353550;
+  --purple:#a855f7;--purple2:#7c3aed;--pink:#ec4899;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--cyan:#06b6d4;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;--radius-xl:20px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;padding:0 0 20px 0;transition:width .3s}
+.sidebar-logo{display:flex;align-items:center;gap:12px;padding:20px 18px 24px;border-bottom:1px solid var(--border)}
+.logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text h1{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.logo-text p{font-size:9px;color:var(--text3);letter-spacing:2px;margin-top:3px}
+.sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;width:100%;text-align:left;transition:all .2s;white-space:nowrap}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(124,58,237,0.15));color:var(--purple);border:1px solid rgba(168,85,247,0.2)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.sidebar-footer{padding:10px 10px 0;border-top:1px solid var(--border);margin-top:auto}
+.sidebar-footer .nav-item{font-size:13px}
+.bell-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:15px;transition:all .2s}
+.bell-btn:hover{border-color:var(--purple);color:var(--purple)}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.content{padding:28px;flex:1}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s,transform .15s}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.stat-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.12;pointer-events:none}
+.stat-label{font-size:10px;color:var(--text3);letter-spacing:2px;font-weight:600;margin-bottom:12px}
+.stat-value{font-family:'Rajdhani',sans-serif;font-size:38px;font-weight:700;line-height:1}
+.stat-value.c-purple{color:var(--purple)}
+.stat-value.c-green{color:var(--green)}
+.stat-value.c-blue{color:var(--blue)}
+.stat-value.c-amber{color:var(--amber)}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:8px}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:15px;font-weight:600;color:var(--text)}
+.card-meta{font-size:12px;color:var(--text3)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+
+/* RANK ITEMS */
+.rank-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:8px;transition:background .2s;cursor:default}
+.rank-item:last-child{margin-bottom:0}
+.rank-item:hover{background:var(--bg4)}
+.rank-num{width:22px;text-align:center;font-size:13px;font-weight:700;color:var(--text3);flex-shrink:0}
+.rank-num.gold{color:#f59e0b}
+.rank-num.silver{color:#94a3b8}
+.rank-num.bronze{color:#b45309}
+.rank-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;overflow:hidden}
+.rank-avatar img{width:100%;height:100%;object-fit:cover}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-weight:600;font-size:14px;color:var(--purple)}
+.rank-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.rank-right{text-align:right}
+.rank-pts{font-size:13px;font-weight:600;color:var(--text)}
+.rank-delta{font-size:12px;font-weight:600;margin-top:2px}
+.rank-delta.neg{color:var(--red)}
+.rank-delta.pos{color:var(--green)}
+.mini-chart{display:flex;align-items:flex-end;gap:2px;height:28px}
+.mini-bar{width:4px;background:var(--purple);border-radius:2px;opacity:.6;transition:opacity .2s}
+.mini-bar:last-child{opacity:1}
+
+/* PERF LIST */
+.perf-list-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.perf-list-item:last-child{border-bottom:none}
+.perf-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff}
+.perf-info{flex:1;min-width:0}
+.perf-name{font-weight:600;font-size:14px}
+.perf-sub{font-size:12px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perf-gain{font-size:14px;font-weight:700}
+.perf-gain.green{color:var(--green)}
+.perf-gain.zero{color:var(--text3)}
+
+/* JOUEURS */
+.page-toolbar{display:flex;gap:12px;margin-bottom:22px;align-items:center}
+.search-wrap{flex:1;position:relative}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px 10px 38px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--purple)}
+.search-input::placeholder{color:var(--text3)}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;border-radius:var(--radius-sm);padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:'Inter',sans-serif;white-space:nowrap;transition:opacity .2s,transform .1s}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{transform:scale(.98)}
+.btn-secondary{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap}
+.btn-secondary:hover{border-color:var(--purple);color:var(--purple)}
+.players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+
+/* PLAYER CARD */
+.player-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative;transition:border-color .2s,transform .15s}
+.player-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.player-card-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.player-av{width:60px;height:60px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;overflow:hidden;position:relative}
+.player-av img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.player-pseudo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1.1}
+.player-realname{font-size:12px;color:var(--text3);margin-top:3px}
+.player-org{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:5px;padding:3px 9px;font-size:11px;font-weight:600;margin-top:6px}
+.player-org.free{background:rgba(100,116,139,.1);color:var(--text3);border-color:var(--border)}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.info-cell{background:var(--bg3);border-radius:var(--radius-sm);padding:9px 12px}
+.info-lbl{font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;margin-bottom:3px}
+.info-val{font-size:14px;font-weight:600;display:flex;align-items:center;gap:5px}
+.contract-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 13px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.contract-lbl{font-size:10px;color:var(--text3);letter-spacing:1px;font-weight:600}
+.contract-val{font-size:12px;font-weight:700}
+.contract-val.green{color:var(--green)}
+.contract-val.amber{color:var(--amber)}
+.contract-val.gray{color:var(--text2)}
+.card-actions{display:flex;gap:7px}
+.act-btn{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px;transition:all .2s;font-family:'Inter',sans-serif}
+.act-btn:hover{border-color:var(--purple);color:var(--purple)}
+.act-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.corner-btn{position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;transition:color .2s;font-size:14px}
+.corner-btn:hover{color:var(--red)}
+
+/* DONNÉES TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;font-size:10px;color:var(--text3);letter-spacing:1.5px;padding:10px 14px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+.data-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid rgba(37,37,53,.7);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge.ft{background:rgba(168,85,247,.12);color:var(--purple)}
+.badge.manual{background:rgba(100,116,139,.1);color:var(--text3)}
+
+/* ORGS */
+.orgs-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.org-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:8px;position:relative;transition:background .2s}
+.org-item:hover{background:var(--bg4)}
+.org-logo-sq{width:42px;height:42px;border-radius:var(--radius-sm);background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.org-logo-sq img{width:100%;height:100%;object-fit:cover}
+.org-name{font-weight:600;font-size:14px}
+.org-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.org-actions{display:flex;gap:5px;margin-left:auto}
+.icon-btn{background:var(--bg4);border:1px solid var(--border);border-radius:5px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:13px;transition:all .2s}
+.icon-btn:hover{border-color:var(--purple);color:var(--purple)}
+.icon-btn.red:hover{border-color:var(--red);color:var(--red)}
+.nego-card{background:var(--bg3);border-radius:var(--radius);padding:16px;margin-bottom:8px}
+.nego-card:last-child{margin-bottom:0}
+.nego-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.nego-title{font-weight:600;font-size:14px}
+.nego-for{font-size:11px;color:var(--text3);margin-top:3px}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700}
+.status-pill.pending{background:rgba(245,158,11,.13);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.status-pill.accepted{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.status-pill.refused{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.nego-field{margin-bottom:8px}
+.nego-field-lbl{font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;margin-bottom:3px}
+.nego-field-val{font-size:13px}
+.nego-foot{display:flex;justify-content:flex-end;gap:5px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+
+/* NOTES */
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.note-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;transition:border-color .2s}
+.note-card:hover{border-color:var(--border2)}
+.note-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-bottom:9px}
+.note-tag.fortnite{background:rgba(168,85,247,.12);color:var(--purple)}
+.note-tag.general{background:rgba(100,116,139,.08);color:var(--text3)}
+.note-title{font-weight:600;font-size:15px;margin-bottom:8px}
+.note-body{font-size:13px;color:var(--text2);line-height:1.65;white-space:pre-wrap}
+.note-date{font-size:11px;color:var(--text3);margin-top:10px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:26px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:22px}
+.form-group{margin-bottom:15px}
+.form-lbl{display:block;font-size:10px;color:var(--text3);letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--purple)}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;appearance:none}
+.form-select:focus{border-color:var(--purple)}
+textarea.form-input{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:10px;margin-top:22px}
+.btn-cancel{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;color:var(--text2);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-cancel:hover{border-color:var(--border2);color:var(--text)}
+.btn-save{flex:2;background:linear-gradient(135deg,var(--purple),var(--purple2));border:none;border-radius:var(--radius-sm);padding:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .2s}
+.btn-save:hover{opacity:.9}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty-state .empty-icon{font-size:44px;margin-bottom:12px}
+.empty-state p{font-size:14px;line-height:1.6}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--bg3);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-sm);padding:12px 20px;font-size:14px;font-weight:600;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{border-color:var(--red);color:var(--red)}
+
+/* FT STATUS */
+.ft-msg{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-top:8px;display:flex;align-items:center;gap:8px}
+.ft-msg.info{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.ft-msg.success{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.ft-msg.error{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* FORTNITE SECTION */
+.ft-panel{background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(6,182,212,.04));border:1px solid rgba(168,85,247,.15);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px}
+.ft-panel-title{font-size:12px;font-weight:700;color:var(--purple);letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ft-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ft-stat{text-align:center}
+.ft-stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text)}
+.ft-stat-lbl{font-size:10px;color:var(--text3);letter-spacing:1px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{width:60px}
+  .sidebar .logo-text,.sidebar .nav-item span,.sidebar .sidebar-footer .nav-item span{display:none}
+  .nav-item{justify-content:center;padding:10px}
+  .main{margin-left:60px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .grid-2,.orgs-layout{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .stat-grid{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🎮</div>
+    <div class="logo-text">
+      <h1>Orphee</h1>
+      <p>MANAGEMENT</p>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="goTo('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" onclick="goTo('joueurs',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Joueurs</span>
+    </button>
+    <button class="nav-item" onclick="goTo('donnees',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Données</span>
+    </button>
+    <button class="nav-item" onclick="goTo('notes',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Notes</span>
+    </button>
+    <button class="nav-item" onclick="goTo('organisations',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <span>Organisations</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item" onclick="showNotifs()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Notifications</span>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--text3)" id="topbar-date"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-glow" style="background:var(--purple)"></div>
+          <div class="stat-label">JOUEURS</div>
+          <div class="stat-value c-purple" id="stat-joueurs">0</div>
+          <div class="stat-sub" id="stat-joueurs-sub">0 sous contrat · 0 free</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-glow" style="background:var(--amber)"></div>
+          <div class="stat-label">CONTRATS À SURVEILLER</div>
+          <div class="stat-value c-amber" id="stat-contrats">0</div>
+          <div class="stat-sub" id="stat-contrats-sub">Tout est en ordre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-glow" style="background:var(--green)"></div>
+          <div class="stat-label">GAINS TOTAUX</div>
+          <div class="stat-value c-green" id="stat-gains">0 €</div>
+          <div class="stat-sub" id="stat-perfs-count">0 performances</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-glow" style="background:var(--blue)"></div>
+          <div class="stat-label">NÉGOCIATIONS</div>
+          <div class="stat-value c-blue" id="stat-negos">0</div>
+          <div class="stat-sub" id="stat-negos-sub">0 en attente · 0 acceptées</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Top gains</span>
+            <span class="card-meta">cumul total</span>
+          </div>
+          <div id="top-gains-content">
+            <div class="empty-state"><div class="empty-icon">🏆</div><p>Aucune performance enregistrée.<br>Ajoute des cups dans l'onglet Données.</p></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Power Ranking</span>
+            <button class="btn-secondary" style="padding:5px 12px;font-size:12px" onclick="refreshPowerRanking()" id="pr-refresh-btn">⟳ Actualiser</button>
+          </div>
+          <div id="power-ranking-content">
+            <div class="empty-state"><div class="empty-icon">📊</div><p>Aucun joueur avec pseudo Epic.<br>Ajoute des joueurs pour voir leur ranking.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Dernières performances</span>
+          <select id="filter-player" class="form-select" style="width:auto;padding:5px 10px;font-size:12px" onchange="renderDashboard()">
+            <option value="all">Tous les joueurs</option>
+          </select>
+        </div>
+        <div id="last-perfs-content">
+          <div class="empty-state"><div class="empty-icon">🎯</div><p>Aucune performance enregistrée.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOUEURS -->
+    <div id="page-joueurs" class="page" style="display:none">
+      <div class="page-toolbar">
+        <div class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="player-search" placeholder="Rechercher un joueur..." oninput="renderPlayers()">
+        </div>
+        <button class="btn-primary" onclick="openModal('modal-player',null,'player')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter
+        </button>
+      </div>
+      <div class="players-grid" id="players-grid">
+        <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>Aucun joueur.<br>Clique sur "+ Ajouter" pour commencer.</p></div>
+      </div>
+    </div>
+
+    <!-- DONNÉES -->
+    <div id="page-donnees" class="page" style="display:none">
+      <div class="page-toolbar" style="flex-wrap:wrap">
+        <select id="data-player-filter" class="form-select" style="width:auto" onchange="renderDonnees()">
+          <option value="all">Tous les joueurs</option>
+        </select>
+        <button class="btn-secondary" onclick="openModal('modal-perf',null,'perf')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Performance manuelle
+        </button>
+        <button class="btn-secondary" onclick="refreshAllFT()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Sync stats &amp; tournois
+        </button>
+        <button class="btn-secondary" onclick="syncTournaments()" id="btn-sync-tournois">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Import tournois seulement
+        </button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="data-table" id="perfs-table">
+          <thead>
+            <tr>
+              <th>JOUEUR</th><th>ÉVÉNEMENT</th><th>DATE</th><th>PLACE</th><th>PTS TOURNOI</th><th>GAINS</th><th>SOURCE</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="perfs-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">Aucune performance. Ajoute-en une ou synchronise Fortnite Tracker.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div id="page-notes" class="page" style="display:none">
+      <div class="page-toolbar">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="openModal('modal-note',null,'note')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvelle note
+        </button>
+      </div>
+      <div class="notes-grid" id="notes-grid">
+        <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📝</div><p>Aucune note. Crée ta première note !</p></div>
+      </div>
+    </div>
+
+    <!-- ORGANISATIONS -->
+    <div id="page-organisations" class="page" style="display:none">
+      <div class="orgs-layout">
+        <div>
+          <div class="card-header" style="margin-bottom:14px">
+            <span class="card-title">Organisations</span>
+            <button class="btn-primary" style="padding:7px 14px;font-size:13px" onclick="openModal('modal-org',null,'org')">+ Ajouter</button>
+          </div>
+          <div id="orgs-list"><div class="empty-state"><div class="empty-icon">🏢</div><p>Aucune organisation.</p></div></div>
+        </div>
+        <div>
+          <div class="card-header" style="margin-bottom:14px">
+            <span class="card-title">Négociations</span>
+            <button class="btn-primary" style="padding:7px 14px;font-size:13px" onclick="openModal('modal-nego',null,'nego')">+ Ajouter</button>
+          </div>
+          <div id="negos-list"><div class="empty-state"><div class="empty-icon">🤝</div><p>Aucune négociation.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- MODALS -->
+
+<!-- JOUEUR -->
+<div id="modal-player" class="modal-overlay" style="display:none" onclick="closeOverlay(event,'modal-player')">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-player-title">Ajouter un joueur</div>
+    <div class="form-group"><label class="form-lbl">PSEUDO IN-GAME *</label><input type="text" class="form-input" id="p-pseudo" placeholder="ex: Ninja"></div>
+    <div class="form-group"><label class="form-lbl">NOM RÉEL</label><input type="text" class="form-input" id="p-name" placeholder="ex: Jean Dupont"></div>
+    <div class="form-group">
+      <label class="form-lbl">PSEUDO EPIC GAMES (Fortnite Tracker)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-input" id="p-epic" placeholder="ex: Ninja" style="flex:1">
+        <button class="btn-secondary" onclick="testFTPlayer()" style="white-space:nowrap">Tester</button>
+      </div>
+      <div id="ft-status" style="display:none;margin-top:8px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-lbl">ÂGE</label><input type="number" class="form-input" id="p-age" placeholder="21"></div>
+      <div class="form-group"><label class="form-lbl">PAYS</label><input type="text" class="form-input" id="p-country" placeholder="France"></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">TYPE DE CONTRAT</label>
+      <select class="form-select" id="p-contract-type" onchange="toggleContractEnd()">
+        <option value="free">Free Agent</option>
+        <option value="cdi">CDI · Indéterminée</option>
+        <option value="cdd">CDD (date de fin)</option>
+      </select>
+    </div>
+    <div class="form-group" id="p-end-group" style="display:none"><label class="form-lbl">FIN DE CONTRAT</label><input type="date" class="form-input" id="p-contract-end"></div>
+    <div class="form-group"><label class="form-lbl">ORGANISATION</label>
+      <select class="form-select" id="p-org"><option value="">Aucune</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-lbl">TWITTER</label><input type="text" class="form-input" id="p-twitter" placeholder="@pseudo"></div>
+      <div class="form-group"><label class="form-lbl">TWITCH</label><input type="text" class="form-input" id="p-twitch" placeholder="pseudo"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-player')">Annuler</button>
+      <button class="btn-save" onclick="savePlayer()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- PERF -->
+<div id="modal-perf" class="modal-overlay" style="display:none" onclick="closeOverlay(event,'modal-perf')">
+  <div class="modal-box">
+    <div class="modal-title">Ajouter une performance</div>
+    <div class="form-group"><label class="form-lbl">JOUEUR *</label><select class="form-select" id="perf-player"></select></div>
+    <div class="form-group"><label class="form-lbl">ÉVÉNEMENT *</label><input type="text" class="form-input" id="perf-event" placeholder="ex: FNCS Division 1"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-lbl">DATE</label><input type="date" class="form-input" id="perf-date"></div>
+      <div class="form-group"><label class="form-lbl">PLACE</label><input type="number" class="form-input" id="perf-place" placeholder="ex: 1" min="1"></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">GAINS (€)</label><input type="number" class="form-input" id="perf-gain" value="0" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-perf')">Annuler</button>
+      <button class="btn-save" onclick="savePerf()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORG -->
+<div id="modal-org" class="modal-overlay" style="display:none" onclick="closeOverlay(event,'modal-org')">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-org-title">Ajouter une organisation</div>
+    <div class="form-group"><label class="form-lbl">NOM *</label><input type="text" class="form-input" id="org-name" placeholder="ex: Team Vitality"></div>
+    <div class="form-group"><label class="form-lbl">CONTACT</label><input type="text" class="form-input" id="org-contact" placeholder="manager@org.com"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-lbl">TWITTER</label><input type="text" class="form-input" id="org-twitter" placeholder="@org"></div>
+      <div class="form-group"><label class="form-lbl">SITE WEB</label><input type="text" class="form-input" id="org-site" placeholder="https://..."></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">NOTES</label><textarea class="form-input" id="org-notes" placeholder="Infos sur l'organisation..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-org')">Annuler</button>
+      <button class="btn-save" onclick="saveOrg()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEGO -->
+<div id="modal-nego" class="modal-overlay" style="display:none" onclick="closeOverlay(event,'modal-nego')">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-nego-title">Ajouter une négociation</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-lbl">ORGANISATION *</label><select class="form-select" id="nego-org"></select></div>
+      <div class="form-group"><label class="form-lbl">JOUEUR *</label><select class="form-select" id="nego-player"></select></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">CONTACT</label><input type="text" class="form-input" id="nego-contact"></div>
+    <div class="form-group"><label class="form-lbl">PROPOSITION</label><textarea class="form-input" id="nego-proposition" placeholder="Détails de la proposition..."></textarea></div>
+    <div class="form-group"><label class="form-lbl">NOTES</label><textarea class="form-input" id="nego-notes"></textarea></div>
+    <div class="form-group"><label class="form-lbl">STATUT</label>
+      <select class="form-select" id="nego-status">
+        <option value="pending">En attente</option>
+        <option value="accepted">Acceptée</option>
+        <option value="refused">Refusée</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-nego')">Annuler</button>
+      <button class="btn-save" onclick="saveNego()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE -->
+<div id="modal-note" class="modal-overlay" style="display:none" onclick="closeOverlay(event,'modal-note')">
+  <div class="modal-box">
+    <div class="modal-title">Nouvelle note</div>
+    <div class="form-group"><label class="form-lbl">TITRE *</label><input type="text" class="form-input" id="note-title" placeholder="Titre de la note"></div>
+    <div class="form-group"><label class="form-lbl">CONTENU</label><textarea class="form-input" id="note-content" rows="5" placeholder="Contenu de la note..."></textarea></div>
+    <div class="form-group"><label class="form-lbl">CATÉGORIE</label>
+      <select class="form-select" id="note-tag">
+        <option value="general">Général</option>
+        <option value="fortnite">Fortnite</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="hideModal('modal-note')">Annuler</button>
+      <button class="btn-save" onclick="saveNote()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== DATA =====
+const ls = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)) || [] } catch { return [] } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+let players = ls.get('or_players');
+let perfs   = ls.get('or_perfs');
+let orgs    = ls.get('or_orgs');
+let negos   = ls.get('or_negos');
+let notes   = ls.get('or_notes');
+let prCache = ls.get('or_pr_cache');
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const fmt = d => { try { return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}) } catch { return d || '—' } };
+const colors = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#db2777','#0891b2','#65a30d','#9333ea','#0284c7'];
+const avatarBg = s => { let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%colors.length; return colors[h]; };
+
+// ===== NAVIGATION =====
+const pages = ['dashboard','joueurs','donnees','notes','organisations'];
+const titles = { dashboard:'Dashboard', joueurs:'Joueurs', donnees:'Données', notes:'Notes', organisations:'Organisations' };
+let currentPage = 'dashboard';
+
+function goTo(page, btn) {
+  pages.forEach(p => {
+    const el = document.getElementById('page-'+p);
+    if (el) el.style.display = p===page ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  currentPage = page;
+  if (page==='dashboard') renderDashboard();
+  if (page==='joueurs') renderPlayers();
+  if (page==='donnees') renderDonnees();
+  if (page==='organisations') renderOrgs();
+  if (page==='notes') renderNotes();
+}
+
+function closeOverlay(e, id) { if (e.target.id===id) hideModal(id); }
+function hideModal(id) { document.getElementById(id).style.display='none'; }
+function showModal(id) { document.getElementById(id).style.display='flex'; }
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const total = players.length;
+  const contracted = players.filter(p => p.contractType !== 'free').length;
+  document.getElementById('stat-joueurs').textContent = total;
+  document.getElementById('stat-joueurs-sub').textContent = contracted + ' sous contrat · ' + (total-contracted) + ' free';
+
+  const today = new Date();
+  const expiring = players.filter(p => {
+    if (!p.contractEnd) return false;
+    const diff = (new Date(p.contractEnd) - today) / 86400000;
+    return diff >= 0 && diff <= 30;
+  });
+  document.getElementById('stat-contrats').textContent = expiring.length;
+  document.getElementById('stat-contrats-sub').textContent = expiring.length ? expiring.map(p=>p.pseudo).join(', ') : 'Tout est en ordre';
+
+  const totalGains = perfs.reduce((s,p) => s + (+p.gain||0), 0);
+  document.getElementById('stat-gains').textContent = totalGains.toLocaleString('fr-FR') + ' €';
+  document.getElementById('stat-perfs-count').textContent = perfs.length + ' performances';
+
+  const pending  = negos.filter(n => n.status==='pending').length;
+  const accepted = negos.filter(n => n.status==='accepted').length;
+  document.getElementById('stat-negos').textContent = negos.length;
+  document.getElementById('stat-negos-sub').textContent = pending + ' en attente · ' + accepted + ' acceptées';
+
+  // Top Gains
+  const byPlayer = {};
+  perfs.forEach(p => { byPlayer[p.playerId] = (byPlayer[p.playerId]||0) + (+p.gain||0); });
+  const sorted = Object.entries(byPlayer).sort((a,b) => b[1]-a[1]);
+  const tg = document.getElementById('top-gains-content');
+  if (!sorted.length) {
+    tg.innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div><p>Aucune performance enregistrée.<br>Ajoute des cups dans l\'onglet Données.</p></div>';
+  } else {
+    tg.innerHTML = sorted.map(([pid,g]) => {
+      const pl = players.find(p => p.id===pid); if (!pl) return '';
+      return `<div class="perf-list-item">
+        <div class="perf-av" style="background:${avatarBg(pl.pseudo)}">${pl.pseudo.slice(0,2).toUpperCase()}</div>
+        <div class="perf-info"><div class="perf-name">${pl.pseudo}</div></div>
+        <div class="perf-gain ${g>0?'green':'zero'}">${g.toLocaleString('fr-FR')} €</div>
+      </div>`;
+    }).join('');
+  }
+
+  renderPowerRanking();
+
+  // Last perfs
+  const fp = document.getElementById('filter-player');
+  const cur = fp.value || 'all';
+  fp.innerHTML = '<option value="all">Tous les joueurs</option>' + players.map(p=>`<option value="${p.id}" ${cur===p.id?'selected':''}>${p.pseudo}</option>`).join('');
+  const filtered = perfs.filter(p => cur==='all'||p.playerId===cur).sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,10);
+  const lp = document.getElementById('last-perfs-content');
+  if (!filtered.length) {
+    lp.innerHTML = '<div class="empty-state"><div class="empty-icon">🎯</div><p>Aucune performance enregistrée.</p></div>';
+  } else {
+    lp.innerHTML = filtered.map(p => {
+      const pl = players.find(x=>x.id===p.playerId); if(!pl)return'';
+      const g = +p.gain||0;
+      return `<div class="perf-list-item">
+        <div class="perf-av" style="background:${avatarBg(pl.pseudo)}">${pl.pseudo.slice(0,2).toUpperCase()}</div>
+        <div class="perf-info">
+          <div class="perf-name"><strong>${pl.pseudo}</strong> · ${p.event}</div>
+          <div style="font-size:12px;color:var(--text3)">${fmt(p.date)} · Place #${p.place}</div>
+        </div>
+        <div class="perf-gain ${g>0?'green':'zero'}">${g.toLocaleString('fr-FR')} €</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ===== FORTNITE API (sans clé, CORS natif) =====
+// Donne : score, wins, K/D, matches — Power Ranking fonctionnel
+async function fetchFTStats(epicId) {
+  try {
+    const res = await fetch(`https://fortnite-api.com/v2/stats/br/v2?name=${encodeURIComponent(epicId)}&accountType=epic`, { headers: { "Authorization": "a2388eb2-3f48-449c-9b6f-7b126739407a" } });
+    if (!res.ok) {
+      console.error('HTTP error:', res.status, res.statusText);
+      return { _error: `HTTP ${res.status}` };
+    }
+    const d = await res.json();
+    if (d.status !== 200) {
+      console.error('API error:', d.status, d.error);
+      return { _error: `API: ${d.error || d.status}` };
+    }
+    const st = d.data?.stats?.all?.overall || {};
+    return {
+      pts:     st.score    || 0,
+      wins:    st.wins     || 0,
+      matches: st.matches  || 0,
+      kd:      st.kd       ? +st.kd.toFixed(2) : 0,
+      winRate: st.winRate  ? +(st.winRate * 100).toFixed(1) : 0,
+      name:    d.data?.account?.name || epicId
+    };
+  } catch(e) {
+    console.error('Fetch error:', e);
+    return { _error: e.message };
+  }
+}
+
+// Pas de données tournoi sans serveur — import manuel uniquement
+async function fetchTRNTournaments(epicId) {
+  return [];
+}
+
+async function testFTPlayer() {
+  const epicId = document.getElementById('p-epic').value.trim();
+  if (!epicId) { toast('Entrez un pseudo Epic d\'abord', 'error'); return; }
+  const st = document.getElementById('ft-status');
+  st.style.display = 'block';
+  st.className = 'ft-msg info';
+  st.innerHTML = '<span class="spin"></span> Recherche en cours...';
+  const data = await fetchFTStats(epicId);
+  if (data && !data._error) {
+    st.className = 'ft-msg success';
+    st.innerHTML = `✅ Trouvé : <strong>${data.name}</strong> — Score: ${data.pts.toLocaleString()} · ${data.wins} victoires · K/D ${data.kd}`;
+  } else {
+    st.className = 'ft-msg error';
+    const errDetail = data?._error ? ` (${data._error})` : '';
+    st.innerHTML = `❌ Échec de la requête${errDetail}. Ouvre la console (F12 → Console) pour plus de détails.`;
+  }
+}
+
+async function refreshPowerRanking() {
+  const btn = document.getElementById('pr-refresh-btn');
+  btn.innerHTML = '<span class="spin"></span> Chargement...';
+  btn.disabled = true;
+  const playersWithEpic = players.filter(p => p.epicId);
+  for (const p of playersWithEpic) {
+    const data = await fetchFTStats(p.epicId);
+    if (data) {
+      const existing = prCache.find(x => x.id===p.id);
+      const oldPts = existing ? existing.pts : null;
+      const delta = oldPts !== null ? data.pts - oldPts : null;
+      const entry = { id:p.id, pts:data.pts, wins:data.wins, kd:data.kd, delta, lastSync: new Date().toISOString().split('T')[0] };
+      if (existing) Object.assign(existing, entry);
+      else prCache.push(entry);
+    }
+  }
+  ls.set('or_pr_cache', prCache);
+  btn.innerHTML = '⟳ Actualiser';
+  btn.disabled = false;
+  renderPowerRanking();
+  toast('Power Ranking mis à jour !');
+}
+
+function renderPowerRanking() {
+  const div = document.getElementById('power-ranking-content');
+  const withEpic = players.filter(p => p.epicId);
+  if (!withEpic.length) {
+    div.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Aucun joueur avec pseudo Epic.</p></div>';
+    return;
+  }
+  const rankNums = ['gold','silver','bronze'];
+  div.innerHTML = withEpic.map((p, i) => {
+    const c = prCache.find(x => x.id===p.id);
+    const pts = c ? c.pts.toLocaleString() : '—';
+    const delta = c && c.delta !== null ? c.delta : null;
+    const lastSync = c ? fmt(c.lastSync) : 'Jamais synchronisé';
+    const bars = c ? [0.4,0.6,0.5,0.8,0.7,0.9,1].map(h=>`<div class="mini-bar" style="height:${Math.round(h*24)}px"></div>`).join('') : '';
+    return `<div class="rank-item">
+      <div class="rank-num ${rankNums[i]||''}">${i+1}</div>
+      <div class="rank-avatar" style="background:${avatarBg(p.pseudo)}">${p.pseudo.slice(0,2).toUpperCase()}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.pseudo}</div>
+        <div class="rank-sub">Dernier relevé : ${lastSync}</div>
+      </div>
+      <div class="rank-right">
+        <div class="rank-pts">${pts} pts</div>
+        ${delta!==null ? `<div class="rank-delta ${delta>=0?'pos':'neg'}">${delta>=0?'↑':'↓'} ${Math.abs(delta).toLocaleString()}</div>` : ''}
+      </div>
+      <div class="mini-chart">${bars}</div>
+    </div>`;
+  }).join('');
+}
+
+async function refreshAllFT() {
+  toast('Synchronisation en cours...');
+  await refreshPowerRanking();
+  await syncTournaments();
+  toast('✅ Synchronisation terminée !');
+}
+
+// Sync les tournois depuis Fortnite Tracker → les ajoute dans perfs
+async function syncTournaments() {
+  const playersWithEpic = players.filter(p => p.epicId);
+  let added = 0;
+  for (const p of playersWithEpic) {
+    const tournois = await fetchTRNTournaments(p.epicId);
+    for (const t of tournois) {
+      // Évite les doublons : même joueur + même événement + même date
+      const exists = perfs.some(x =>
+        x.playerId === p.id &&
+        x.event    === t.event &&
+        x.date     === t.date &&
+        x.source   === 'FT Auto'
+      );
+      if (!exists) {
+        perfs.push({ id: uid(), playerId: p.id, event: t.event, date: t.date, place: t.place, gain: t.gain, source: 'FT Auto' });
+        added++;
+      }
+    }
+  }
+  ls.set('or_perfs', perfs);
+  renderDonnees();
+  renderDashboard();
+  if (added > 0) toast(`🏆 ${added} tournoi(s) importé(s) depuis Fortnite Tracker`);
+}
+
+// ===== JOUEURS =====
+function renderPlayers() {
+  const q = (document.getElementById('player-search').value || '').toLowerCase();
+  const filtered = players.filter(p => p.pseudo.toLowerCase().includes(q) || (p.name||'').toLowerCase().includes(q));
+  const grid = document.getElementById('players-grid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>Aucun joueur trouvé.</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p => {
+    const org = orgs.find(o => o.id===p.orgId);
+    const days = p.contractEnd ? Math.ceil((new Date(p.contractEnd)-new Date())/86400000) : null;
+    let contractHtml = '';
+    if (p.contractType==='free') contractHtml = `<div class="contract-row"><span class="contract-lbl">CONTRAT</span><span class="contract-val gray">Free Agent</span></div>`;
+    else if (p.contractType==='cdi') contractHtml = `<div class="contract-row"><span class="contract-lbl">CONTRAT</span><span class="contract-val green">CDI · Indéterminée</span></div>`;
+    else contractHtml = `<div class="contract-row"><span class="contract-lbl">CONTRAT</span><span class="contract-val ${days<=30?'amber':'green'}">${days}j restants</span></div>`;
+    const c = prCache.find(x => x.id===p.id);
+    const ftHtml = c ? `<div style="font-size:11px;color:var(--purple);margin-top:6px">⚡ ${c.pts.toLocaleString()} pts · ${c.wins} wins · K/D ${c.kd||'?'}</div>` : '';
+    return `<div class="player-card">
+      <button class="corner-btn" onclick="delItem('player','${p.id}')">🗑</button>
+      <div class="player-card-top">
+        <div class="player-av" style="background:${avatarBg(p.pseudo)}">${p.pseudo.slice(0,2).toUpperCase()}</div>
+        <div style="min-width:0">
+          <div class="player-pseudo">${p.pseudo}</div>
+          ${p.name?`<div class="player-realname">${p.name}</div>`:''}
+          <div class="player-org ${!org?'free':''}">${org?'🏢 '+org.name:'Free Agent'}</div>
+          ${ftHtml}
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell"><div class="info-lbl">ÂGE</div><div class="info-val">${p.age||'—'}</div></div>
+        <div class="info-cell"><div class="info-lbl">PAYS</div><div class="info-val">${p.country||'—'}</div></div>
+      </div>
+      ${contractHtml}
+      <div class="card-actions">
+        ${p.twitter?`<button class="act-btn" onclick="open('https://twitter.com/${p.twitter.replace('@','')}')" title="Twitter">𝕏</button>`:'<button class="act-btn" disabled style="opacity:.3" title="Twitter">𝕏</button>'}
+        ${p.twitch?`<button class="act-btn" onclick="open('https://twitch.tv/${p.twitch}')" title="Twitch">📺</button>`:'<button class="act-btn" disabled style="opacity:.3" title="Twitch">📺</button>'}
+        <button class="act-btn" onclick="openModal('modal-player','${p.id}','player')" title="Modifier">✏️</button>
+        ${p.epicId?`<button class="act-btn" style="color:var(--purple)" onclick="syncOnePlayer('${p.id}')" title="Sync FT">⟳</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function syncOnePlayer(id) {
+  const p = players.find(x=>x.id===id); if(!p||!p.epicId) return;
+  const data = await fetchFTStats(p.epicId);
+  if (data) {
+    const existing = prCache.find(x=>x.id===id);
+    const oldPts = existing ? existing.pts : null;
+    const entry = { id, pts:data.pts, wins:data.wins, kd:data.kd, delta: oldPts!==null?data.pts-oldPts:null, lastSync: new Date().toISOString().split('T')[0] };
+    if (existing) Object.assign(existing, entry);
+    else prCache.push(entry);
+    ls.set('or_pr_cache', prCache);
+    toast(`✅ ${p.pseudo} : ${data.pts.toLocaleString()} pts`);
+    renderPlayers();
+  } else {
+    toast('❌ Impossible de récupérer les stats', 'error');
+  }
+}
+
+let editingId = null;
+function openModal(modalId, id, type) {
+  editingId = id;
+  if (type==='player') {
+    const p = id ? players.find(x=>x.id===id) : null;
+    document.getElementById('modal-player-title').textContent = p ? 'Modifier le joueur' : 'Ajouter un joueur';
+    document.getElementById('p-pseudo').value = p?.pseudo||'';
+    document.getElementById('p-name').value = p?.name||'';
+    document.getElementById('p-epic').value = p?.epicId||'';
+    document.getElementById('p-age').value = p?.age||'';
+    document.getElementById('p-country').value = p?.country||'';
+    document.getElementById('p-twitter').value = p?.twitter||'';
+    document.getElementById('p-twitch').value = p?.twitch||'';
+    document.getElementById('p-contract-type').value = p?.contractType||'free';
+    document.getElementById('p-contract-end').value = p?.contractEnd||'';
+    document.getElementById('ft-status').style.display = 'none';
+    toggleContractEnd();
+    const orgSel = document.getElementById('p-org');
+    orgSel.innerHTML = '<option value="">Aucune</option>' + orgs.map(o=>`<option value="${o.id}" ${o.id===p?.orgId?'selected':''}>${o.name}</option>`).join('');
+  }
+  if (type==='perf') {
+    document.getElementById('perf-player').innerHTML = players.map(p=>`<option value="${p.id}">${p.pseudo}</option>`).join('');
+    document.getElementById('perf-event').value = '';
+    document.getElementById('perf-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('perf-place').value = '';
+    document.getElementById('perf-gain').value = '0';
+  }
+  if (type==='org') {
+    const o = id ? orgs.find(x=>x.id===id) : null;
+    document.getElementById('modal-org-title').textContent = o ? 'Modifier l\'organisation' : 'Ajouter une organisation';
+    document.getElementById('org-name').value = o?.name||'';
+    document.getElementById('org-contact').value = o?.contact||'';
+    document.getElementById('org-twitter').value = o?.twitter||'';
+    document.getElementById('org-site').value = o?.site||'';
+    document.getElementById('org-notes').value = o?.notes||'';
+  }
+  if (type==='nego') {
+    const n = id ? negos.find(x=>x.id===id) : null;
+    document.getElementById('modal-nego-title').textContent = n ? 'Modifier la négociation' : 'Ajouter une négociation';
+    document.getElementById('nego-org').innerHTML = orgs.map(o=>`<option value="${o.id}" ${o.id===n?.orgId?'selected':''}>${o.name}</option>`).join('');
+    document.getElementById('nego-player').innerHTML = players.map(p=>`<option value="${p.id}" ${p.id===n?.playerId?'selected':''}>${p.pseudo}</option>`).join('');
+    document.getElementById('nego-contact').value = n?.contact||'';
+    document.getElementById('nego-proposition').value = n?.proposition||'';
+    document.getElementById('nego-notes').value = n?.notes||'';
+    document.getElementById('nego-status').value = n?.status||'pending';
+  }
+  if (type==='note') {
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-tag').value = 'general';
+  }
+  showModal(modalId);
+}
+
+function toggleContractEnd() {
+  const t = document.getElementById('p-contract-type').value;
+  document.getElementById('p-end-group').style.display = t==='cdd' ? 'block' : 'none';
+}
+
+function savePlayer() {
+  const pseudo = document.getElementById('p-pseudo').value.trim();
+  if (!pseudo) { toast('Le pseudo est obligatoire', 'error'); return; }
+  const p = {
+    pseudo, name: document.getElementById('p-name').value.trim(),
+    epicId: document.getElementById('p-epic').value.trim(),
+    age: document.getElementById('p-age').value,
+    country: document.getElementById('p-country').value.trim(),
+    contractType: document.getElementById('p-contract-type').value,
+    contractEnd: document.getElementById('p-contract-end').value || null,
+    orgId: document.getElementById('p-org').value || null,
+    twitter: document.getElementById('p-twitter').value.trim(),
+    twitch: document.getElementById('p-twitch').value.trim(),
+  };
+  if (editingId) Object.assign(players.find(x=>x.id===editingId), p);
+  else { p.id=uid(); players.push(p); }
+  ls.set('or_players', players);
+  hideModal('modal-player');
+  renderPlayers(); renderDashboard();
+  toast('Joueur enregistré ✅');
+}
+
+// ===== DONNÉES =====
+function renderDonnees() {
+  const sel = document.getElementById('data-player-filter');
+  const cur = sel.value||'all';
+  sel.innerHTML = '<option value="all">Tous les joueurs</option>' + players.map(p=>`<option value="${p.id}" ${cur===p.id?'selected':''}>${p.pseudo}</option>`).join('');
+  const filtered = perfs.filter(p => cur==='all'||p.playerId===cur).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tbody = document.getElementById('perfs-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">Aucune performance.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(p => {
+    const pl = players.find(x=>x.id===p.playerId);
+    const g  = +p.gain||0;
+    const pts = p.pts ? (+p.pts).toLocaleString() : '—';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:50%;background:${avatarBg(pl?.pseudo||'?')};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${(pl?.pseudo||'?').slice(0,2).toUpperCase()}</div>
+        <strong>${pl?.pseudo||'?'}</strong>
+      </div></td>
+      <td>${p.event}</td>
+      <td style="color:var(--text3)">${fmt(p.date)}</td>
+      <td><strong>#${p.place}</strong></td>
+      <td style="color:var(--purple);font-weight:600">${pts}</td>
+      <td style="color:${g>0?'var(--green)':'var(--text3)'};font-weight:700">${g>0?g.toLocaleString('fr-FR')+' €':'—'}</td>
+      <td><span class="badge ${p.source==='FT Auto'?'ft':'manual'}">${p.source||'Manuel'}</span></td>
+      <td><button class="icon-btn red" onclick="delItem('perf','${p.id}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function savePerf() {
+  const playerId = document.getElementById('perf-player').value;
+  const event = document.getElementById('perf-event').value.trim();
+  if (!playerId||!event) { toast('Joueur et événement obligatoires', 'error'); return; }
+  perfs.push({ id:uid(), playerId, event, date:document.getElementById('perf-date').value, place:+document.getElementById('perf-place').value||0, gain:+document.getElementById('perf-gain').value||0, source:'Manuel' });
+  ls.set('or_perfs', perfs);
+  hideModal('modal-perf');
+  renderDonnees(); renderDashboard();
+  toast('Performance ajoutée ✅');
+}
+
+// ===== ORGS =====
+function renderOrgs() {
+  const ol = document.getElementById('orgs-list');
+  ol.innerHTML = !orgs.length ? '<div class="empty-state"><div class="empty-icon">🏢</div><p>Aucune organisation.</p></div>' :
+    orgs.map(o => `<div class="org-item">
+      <div class="org-logo-sq">🏢</div>
+      <div style="flex:1;min-width:0">
+        <div class="org-name">${o.name}</div>
+        <div class="org-meta">${[o.contact,o.twitter,o.site?`<a href="${o.site}" style="color:var(--blue)" target="_blank">site</a>`:''].filter(Boolean).join(' · ')}</div>
+        ${o.notes?`<div style="font-size:12px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.notes}</div>`:''}
+      </div>
+      <div class="org-actions">
+        <button class="icon-btn" onclick="openModal('modal-org','${o.id}','org')">✏️</button>
+        <button class="icon-btn red" onclick="delItem('org','${o.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+
+  const nl = document.getElementById('negos-list');
+  nl.innerHTML = !negos.length ? '<div class="empty-state"><div class="empty-icon">🤝</div><p>Aucune négociation.</p></div>' :
+    negos.map(n => {
+      const org = orgs.find(o=>o.id===n.orgId);
+      const pl  = players.find(p=>p.id===n.playerId);
+      const statusLabels = {pending:'En attente',accepted:'Acceptée',refused:'Refusée'};
+      const statusDots   = {pending:'●',accepted:'✓',refused:'✗'};
+      return `<div class="nego-card">
+        <div class="nego-head">
+          <div>
+            <div class="nego-title">${org?.name||'—'}</div>
+            <div class="nego-for">Pour : ${pl?.pseudo||'?'} · ${fmt(n.date)}</div>
+          </div>
+          <span class="status-pill ${n.status}">${statusDots[n.status]} ${statusLabels[n.status]}</span>
+        </div>
+        ${n.contact?`<div class="nego-field"><div class="nego-field-lbl">CONTACT</div><div class="nego-field-val">${n.contact}</div></div>`:''}
+        ${n.proposition?`<div class="nego-field"><div class="nego-field-lbl">PROPOSITION</div><div class="nego-field-val">${n.proposition}</div></div>`:''}
+        ${n.notes?`<div class="nego-field"><div class="nego-field-lbl">NOTES</div><div class="nego-field-val">${n.notes}</div></div>`:''}
+        <div class="nego-foot">
+          <button class="icon-btn" onclick="openModal('modal-nego','${n.id}','nego')">✏️</button>
+          <button class="icon-btn red" onclick="delItem('nego','${n.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function saveOrg() {
+  const name = document.getElementById('org-name').value.trim();
+  if (!name) { toast('Nom obligatoire', 'error'); return; }
+  const o = { name, contact:document.getElementById('org-contact').value.trim(), twitter:document.getElementById('org-twitter').value.trim(), site:document.getElementById('org-site').value.trim(), notes:document.getElementById('org-notes').value.trim() };
+  if (editingId) Object.assign(orgs.find(x=>x.id===editingId), o);
+  else { o.id=uid(); orgs.push(o); }
+  ls.set('or_orgs', orgs);
+  hideModal('modal-org');
+  renderOrgs();
+  toast('Organisation enregistrée ✅');
+}
+
+function saveNego() {
+  const orgId = document.getElementById('nego-org').value;
+  const playerId = document.getElementById('nego-player').value;
+  if (!orgId||!playerId) { toast('Organisation et joueur obligatoires', 'error'); return; }
+  const n = { orgId, playerId, contact:document.getElementById('nego-contact').value.trim(), proposition:document.getElementById('nego-proposition').value.trim(), notes:document.getElementById('nego-notes').value.trim(), status:document.getElementById('nego-status').value, date:new Date().toISOString().split('T')[0] };
+  if (editingId) Object.assign(negos.find(x=>x.id===editingId), n);
+  else { n.id=uid(); negos.push(n); }
+  ls.set('or_negos', negos);
+  hideModal('modal-nego');
+  renderOrgs(); renderDashboard();
+  toast('Négociation enregistrée ✅');
+}
+
+// ===== NOTES =====
+function renderNotes() {
+  const grid = document.getElementById('notes-grid');
+  if (!notes.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📝</div><p>Aucune note.</p></div>';
+    return;
+  }
+  grid.innerHTML = notes.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(n=>`
+    <div class="note-card">
+      <button class="corner-btn" onclick="delItem('note','${n.id}')">🗑</button>
+      <div class="note-tag ${n.tag}">${n.tag==='fortnite'?'🎮 Fortnite':'📋 Général'}</div>
+      <div class="note-title">${n.title}</div>
+      <div class="note-body">${n.content}</div>
+      <div class="note-date">${fmt(n.date)}</div>
+    </div>`).join('');
+}
+
+function saveNote() {
+  const title = document.getElementById('note-title').value.trim();
+  if (!title) { toast('Titre obligatoire', 'error'); return; }
+  notes.push({ id:uid(), title, content:document.getElementById('note-content').value.trim(), tag:document.getElementById('note-tag').value, date:new Date().toISOString().split('T')[0] });
+  ls.set('or_notes', notes);
+  hideModal('modal-note');
+  renderNotes();
+  toast('Note enregistrée ✅');
+}
+
+// ===== DELETE =====
+function delItem(type, id) {
+  if (!confirm('Supprimer cet élément ?')) return;
+  if (type==='player') { players=players.filter(x=>x.id!==id); ls.set('or_players',players); renderPlayers(); renderDashboard(); }
+  if (type==='perf')   { perfs=perfs.filter(x=>x.id!==id);     ls.set('or_perfs',perfs);     renderDonnees(); renderDashboard(); }
+  if (type==='org')    { orgs=orgs.filter(x=>x.id!==id);       ls.set('or_orgs',orgs);       renderOrgs(); }
+  if (type==='nego')   { negos=negos.filter(x=>x.id!==id);     ls.set('or_negos',negos);     renderOrgs(); renderDashboard(); }
+  if (type==='note')   { notes=notes.filter(x=>x.id!==id);     ls.set('or_notes',notes);     renderNotes(); }
+  toast('Élément supprimé');
+}
+
+// ===== NOTIFICATIONS =====
+function showNotifs() {
+  const expiring = players.filter(p => {
+    if (!p.contractEnd) return false;
+    return (new Date(p.contractEnd)-new Date())/86400000 <= 30;
+  });
+  if (!expiring.length) alert('✅ Aucune notification — tout est en ordre !');
+  else alert('⚠️ Contrats expirant dans moins de 30 jours :\n' + expiring.map(p=>`• ${p.pseudo} (${fmt(p.contractEnd)})`).join('\n'));
+}
+
+// ===== INIT =====
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+renderDashboard();
+</script>
+</body>
+</html>
